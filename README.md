@@ -1,6 +1,6 @@
 # Network Monitor
 
-This resposity describes Docker images for network moniting and storage on Apache Cassandra.
+This respository describes Docker images for network monitoring and storage on Apache Cassandra.
 
 ## Running all containers
 
@@ -18,7 +18,7 @@ docker exec -ti zeek zeekctl deploy
 
 If you need to load a PCAP file into Zeek:
 ```
-docker exec -ti zeek zeek -r maccdc2012_00000.pcap local.zeek
+docker exec -ti zeek zeek -r /data/maccdc2012_00000.pcap local.zeek
 ```
 Assuming that the PCAP file is inside the container. If not, you need to map the file by Docker volumes.
 
@@ -30,6 +30,7 @@ If Zeek container gives an error, verify if the network interface is the same th
 Zeek produces network logs into Kafka. The script ```consumer.py``` is able to consume Kafka and insert data into Cassandra database. The requirements of this script are:
 - kafka-python 1.4.6
 - cassandra-driver 3.19.0
+
 You can create a Python virtualenv:
 ```
 virtualenv -p python3 .
@@ -37,12 +38,18 @@ source bin/activate
 pip install -r requirements.txt
 ```
 
-First, you need to discover Cassandra IP:
+First, you need to discover Cassandra's IP address:
 ```
 docker exec -ti cassandra-n01 ip a
 ```
-Modify the script with this IP and run. You should see all messages on the terminal.
+Modify the script with this IP and run. You should see all messages on the terminal. 
 
+To check if Cassandra is receiving all messages, connect in the container:
+```
+docker exec -ti cassandra-n01 cqlsh
+cqlsh> describe keyspace packets;
+cqlsh> select * from packets.connection;
+```
 
 ## Images 
 Images used in project:
