@@ -12,7 +12,7 @@ consumer = KafkaConsumer(
      group_id='my-group',
      value_deserializer=lambda x: loads(x.decode('utf-8')))
 
-clusterIPs = ['172.28.0.2']
+clusterIPs = ['172.29.0.2']
 
 ConnectDB( clusterIPs )
 print("Starting ...")

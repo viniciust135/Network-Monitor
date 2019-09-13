@@ -29,7 +29,34 @@ def create_tables():
 
 
 def insert_connection(data):
-	Connection.create(service=str(data.get('service')), duration=str(data.get('duration')), orig_bytes=str(data.get('orig_bytes')), resp_bytes=str(data.get('resp_bytes')), conn_state=str(data.get('conn_state')), local_orig=str(data.get('local_orig')), local_resp=str(data.get('local_resp')), missed_bytes=str(data.get('missed_bytes')), history=str(data.get('history')), orig_pkts=str(data.get('orig_pkts')), orig_ip_bytes=str(data.get('orig_ip_bytes')), resp_pkts=str(data.get('resp_pkts')), resp_ip_bytes=str(data.get('resp_ip_bytes')), tunnel_parents=str(data.get('tunnel_parents')), vlan=str(data.get('vlan')), inner_vlan=str(data.get('inner_vlan')), orig_l2_addr=str(data.get('orig_l2_addr')), resp_l2_addr=str(data.get('resp_l2_addr')))
+	#Connection.create(service=str(data.get('service')), duration=str(data.get('duration')), orig_bytes=str(data.get('orig_bytes')), resp_bytes=str(data.get('resp_bytes')), conn_state=str(data.get('conn_state')), local_orig=str(data.get('local_orig')), local_resp=str(data.get('local_resp')), missed_bytes=str(data.get('missed_bytes')), history=str(data.get('history')), orig_pkts=str(data.get('orig_pkts')), orig_ip_bytes=str(data.get('orig_ip_bytes')), resp_pkts=str(data.get('resp_pkts')), resp_ip_bytes=str(data.get('resp_ip_bytes')), tunnel_parents=str(data.get('tunnel_parents')), vlan=str(data.get('vlan')), inner_vlan=str(data.get('inner_vlan')), orig_l2_addr=str(data.get('orig_l2_addr')), resp_l2_addr=str(data.get('resp_l2_addr')))
+ 	Connection.create(
+                 ts = float(data.get('ts')),
+                 uid = str(data.get('uid')),
+                 orig_h = str(data.get('id.orig_h')),
+                 orig_p = int(data.get('id.orig_p')),
+                 resp_h = str(data.get('id.resp_h')),
+                 resp_p = int(data.get('id.resp_p')),
+                 proto = str(data.get('proto')),
+                 duration = float(0 if data.get('duration') is None else data.get('duration')),                 
+                 orig_bytes = int(0 if data.get('orig_bytes') is None else data.get('orig_bytes')),
+                 resp_bytes = int(0 if data.get('resp_bytes') is None else data.get('resp_bytes')), 
+                 conn_state = str(data.get('conn_state')),
+                 #local_orig =   False             
+                 # local_resp False
+                 missed_bytes = int(data.get('missed_bytes')),
+                 history = str(data.get('history')),
+                 orig_pkts = int(data.get('orig_pkts')),
+                 orig_ip_bytes = int(data.get('orig_ip_bytes')),
+                 resp_pkts = int(data.get('resp_pkts')),
+                 resp_ip_bytes = int(data.get('resp_ip_bytes')),
+                 orig_l2_addr = str(data.get('orig_l2_addr')),
+                 resp_l2_addr = str(data.get('resp_l2_addr'))
+         )
+
+ 
+ #{'conn': {'ts': 1568404324.317454, 'uid': 'CTRyjOWK8cOMG8FU7', 'id.orig_h': '200.18.42.61', 'id.orig_p': 53409, 'id.resp_h': '239.255.255.250', 'id.resp_p': 1900, 'proto': 'udp', 'duration': 3.0016438961029053, 'orig_bytes': 696, 'resp_bytes': 0, 'conn_state': 'S0', 'local_orig': False, 'local_resp': False, 'missed_bytes': 0, 'history': 'D', 'orig_pkts': 4, 'orig_ip_bytes': 808, 'resp_pkts': 0, 'resp_ip_bytes': 0, 'orig_l2_addr': '2c:59:e5:be:6a:5c', 'resp_l2_addr': '01:00:5e:7f:ff:fa'}}                       
+
 
 def insert_ssh(data):
 	SSH.create(version_1=str(data.get('version_1')), auth_success=str(data.get('auth_success')), auth_attempts=str(data.get('auth_attempts')), direction=str(data.get('direction')), client=str(data.get('client')), server=str(data.get('server')), cipher_alg=str(data.get('cipher_alg')), mac_alg=str(data.get('mac_alg')), compression_alg=str(data.get('compression_alg')), kex_alg=str(data.get('kex_alg')), host_key_alg=str(data.get('host_key_alg')), host_key=str(data.get('host_key')))
@@ -42,27 +69,32 @@ def insert_http(data):
 
 def insert_dns(data):
 	DNS.create(trans_id=str(data.get('trans_id')), rtt=str(data.get('rtt')), query=str(data.get('query')), qclass=str(data.get('qclass')), qclass_name=str(data.get('qclass_name')), qtype=str(data.get('qtype')), qtype_name=str(data.get('qtype_name')), rcode=str(data.get('rcode')), rcode_name=str(data.get('rcode_name')), aa=str(data.get('aa')), tc=str(data.get('tc')), rd=str(data.get('rd')), ra=str(data.get('ra')), z=str(data.get('z')), answers=str(data.get('answers')), ttls=str(data.get('ttls')), rejected=str(data.get('rejected')), addl=str(data.get('addl')), auth=str(data.get('auth')))
-                       
+
+#{'conn': {'ts': 1568404324.317454, 'uid': 'CTRyjOWK8cOMG8FU7', 'id.orig_h': '200.18.42.61', 'id.orig_p': 53409, 'id.resp_h': '239.255.255.250', 'id.resp_p': 1900, 'proto': 'udp', 'duration': 3.0016438961029053, 'orig_bytes': 696, 'resp_bytes': 0, 'conn_state': 'S0', 'local_orig': False, 'local_resp': False, 'missed_bytes': 0, 'history': 'D', 'orig_pkts': 4, 'orig_ip_bytes': 808, 'resp_pkts': 0, 'resp_ip_bytes': 0, 'orig_l2_addr': '2c:59:e5:be:6a:5c', 'resp_l2_addr': '01:00:5e:7f:ff:fa'}}                       
 class Connection(Model):
         id = columns.UUID(primary_key=True, default=uuid.uuid4)
-        service = columns.Text(required=False)
-        duration = columns.Text(required=False)
-        orig_bytes = columns.Text(required=False)
-        resp_bytes = columns.Text(required=False)
+        ts = columns.Float(required=False)
+        uid = columns.Text(required=False)
+        orig_h = columns.Text(required=False)
+        orig_p = columns.Integer(required=False)
+        resp_h = columns.Text(required=False)
+        resp_p = columns.Integer(required=False)
+        proto = columns.Text(required=False)
+        duration = columns.Float(required=False)
+        orig_bytes = columns.Integer(required=False)
+        resp_bytes = columns.Integer(required=False)
         conn_state = columns.Text(required=False)
-        local_orig = columns.Text(required=False)
-        local_resp = columns.Text(required=False)
-        missed_bytes = columns.Text(required=False)
+        #local_orig =   False             
+        # local_resp False
+        missed_bytes = columns.Integer(required=False)
         history = columns.Text(required=False)
-        orig_pkts = columns.Text(required=False)
-        orig_ip_bytes = columns.Text(required=False)
-        resp_pkts = columns.Text(required=False)
-        resp_ip_bytes = columns.Text(required=False)
-        tunnel_parents = columns.Text(required=False)
-        vlan = columns.Text(required=False)
-        inner_vlan = columns.Text(required=False)
+        orig_pkts = columns.Integer(required=False)
+        orig_ip_bytes = columns.Integer(required=False)
+        resp_pkts = columns.Integer(required=False)
+        resp_ip_bytes = columns.Integer(required=False)
         orig_l2_addr = columns.Text(required=False)
         resp_l2_addr = columns.Text(required=False)
+        
 
 class SSH(Model):
         id = columns.UUID(primary_key=True, default=uuid.uuid4)
