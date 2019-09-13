@@ -1,33 +1,32 @@
 from cassandra.cluster import Cluster
 from cassandra.cqlengine import columns
 from cassandra.cqlengine.models import Model
+from cassandra.cqlengine.management import sync_table
+from cassandra.cqlengine import connection
 import uuid
 
-#https://docs.datastax.com/en/developer/python-driver/3.19/getting_started/
+def ConnectDB( clusterIPs ):
+        # cluster connection, keyspace, and protocol version
+        create_keyspace( clusterIPs )
+        connection.setup( clusterIPs, "packets", protocol_version=3 )
+        create_tables()
 
-'''class Connect_db:
-        def __init__(self):
-                cluster = Cluster(['172.17.0.1', '172.17.0.2']) #This will attempt to connection to a Cassandra instance on your local machine (127.0.0.1). You can also specify a list of IP addresses for nodes in your cluster
-                self.session = cluster.connect()
-                print(self.session)
-                self.session.execute("CREATE KEYSPACE IF NOT EXISTS packets WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 2 }");
-                #self.session.execute("CREATE COLUMNFAMILY IF NOT EXISTS conn (id )");
-                #self.session.execute("CREATE KEYSPACE IF NOT EXISTS packets WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 2 }");
-                #self.session.execute("CREATE KEYSPACE IF NOT EXISTS packets WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 2 }");
-                #self.session.execute("CREATE KEYSPACE IF NOT EXISTS packets WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 2 }");
-                #self.session.execute("CREATE KEYSPACE IF NOT EXISTS packets WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 2 }");
-                self.session.set_keyspace('packets')
 
-        def close(self): #Fecha conexão
-                self.session.close()
-        
-        #def put_data_conn(self, data): #Insere dados'''
-
-def create_keyspace():
-	cluster = Cluster(['172.22.0.2', '172.22.0.3', '172.22.0.4']) #This will attempt to connection to a Cassandra instance on your local machine (127.0.0.1). You can also specify a list of IP addresses for nodes in your cluster
+def create_keyspace( clusterIPs ):
+        cluster = Cluster( clusterIPs )
+        #This will attempt to connection to a Cassandra instance on your local machine (127.0.0.1). You can also specify a list of IP addresses for nodes in your cluster
         session = cluster.connect()
         session.execute("CREATE KEYSPACE IF NOT EXISTS packets WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 3 }");	
-	cluster.shutdown() 
+        cluster.shutdown() 
+
+def create_tables():
+        # https://docs.datastax.com/en/developer/python-driver/3.19/api/cassandra/cqlengine/management/
+        sync_table(Connection)
+        sync_table(SSH)
+        sync_table(DHCP)
+        sync_table(HTTP)
+        sync_table(DNS)
+
 
 def insert_connection(data):
 	Connection.create(service=str(data.get('service')), duration=str(data.get('duration')), orig_bytes=str(data.get('orig_bytes')), resp_bytes=str(data.get('resp_bytes')), conn_state=str(data.get('conn_state')), local_orig=str(data.get('local_orig')), local_resp=str(data.get('local_resp')), missed_bytes=str(data.get('missed_bytes')), history=str(data.get('history')), orig_pkts=str(data.get('orig_pkts')), orig_ip_bytes=str(data.get('orig_ip_bytes')), resp_pkts=str(data.get('resp_pkts')), resp_ip_bytes=str(data.get('resp_ip_bytes')), tunnel_parents=str(data.get('tunnel_parents')), vlan=str(data.get('vlan')), inner_vlan=str(data.get('inner_vlan')), orig_l2_addr=str(data.get('orig_l2_addr')), resp_l2_addr=str(data.get('resp_l2_addr')))
@@ -136,6 +135,26 @@ class DNS(Model):
         auth = columns.Text(required=False)
 
 
+
+#https://docs.datastax.com/en/developer/python-driver/3.19/getting_started/
+
+'''class Connect_db:
+        def __init__(self):
+                cluster = Cluster(['172.17.0.1', '172.17.0.2']) #This will attempt to connection to a Cassandra instance on your local machine (127.0.0.1). You can also specify a list of IP addresses for nodes in your cluster
+                self.session = cluster.connect()
+                print(self.session)
+                self.session.execute("CREATE KEYSPACE IF NOT EXISTS packets WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 2 }");
+                #self.session.execute("CREATE COLUMNFAMILY IF NOT EXISTS conn (id )");
+                #self.session.execute("CREATE KEYSPACE IF NOT EXISTS packets WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 2 }");
+                #self.session.execute("CREATE KEYSPACE IF NOT EXISTS packets WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 2 }");
+                #self.session.execute("CREATE KEYSPACE IF NOT EXISTS packets WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 2 }");
+                #self.session.execute("CREATE KEYSPACE IF NOT EXISTS packets WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 2 }");
+                self.session.set_keyspace('packets')
+
+        def close(self): #Fecha conexão
+                self.session.close()
+        
+        #def put_data_conn(self, data): #Insere dados'''
 
 '''
 rows = session.execute('SELECT name, age, email FROM users')

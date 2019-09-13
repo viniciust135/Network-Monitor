@@ -2,7 +2,6 @@
 version: '3'
 
 services:
-
   zookeeper:
     image: wurstmeister/zookeeper:latest
     expose:
@@ -29,31 +28,37 @@ services:
     volumes:
       - ./node.cfg:/usr/local/zeek/etc/node.cfg
       - ./local.zeek:/usr/local/zeek/share/zeek/site/local.zeek
+      - ./main.zeek:/usr/local/zeek/share/zeek/base/frameworks/logging/main.zeek
 
-  cassandra-node1:
+  cassandra-n01:
     image: cassandra:latest
-    container_name: node1
+    container_name: cassandra-n01
+    volumes:
+      - n01-volume:/var/lib/cassandra
     environment:
       - CASSANDRA_CLUSTER_NAME=cassandra-cluster
-      - CASSANDRA_SEEDS=cassandra-node1
-        #      - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2, cassandra-node3
+      - CASSANDRA_SEEDS=cassandra-n01
+#     - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2, cassandra-node3
 
-        #  cassandra-node2:
-        #    image: cassandra:latest
-        #    container_name: node2
-        #    environment:
-        #      - CASSANDRA_CLUSTER_NAME=cassandra-cluster
-        #      - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2, cassandra-node3
-        #
-        #  cassandra-node3:
-        #    image: cassandra:latest
-        #    container_name: node3
-        #    environment:
-        #      - CASSANDRA_CLUSTER_NAME=cassandra-cluster
-        #      - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2, cassandra-node3
-        #
-        #  spark-streaming:
-        #    image: thiagosordi/spark-streaming
-        #    network_mode: host
-        #    container_name: spark-streaming
-    
+#  cassandra-node2:
+#    image: cassandra:latest
+#    container_name: node2
+#    environment:
+#      - CASSANDRA_CLUSTER_NAME=cassandra-cluster
+#      - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2, cassandra-node3
+#
+#  cassandra-node3:
+#    image: cassandra:latest
+#    container_name: node3
+#    environment:
+#      - CASSANDRA_CLUSTER_NAME=cassandra-cluster
+#      - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2, cassandra-node3
+#
+#  spark-streaming:
+#    image: thiagosordi/spark-streaming
+#    network_mode: host
+#    container_name: spark-streaming
+
+volumes:
+  n01-volume:
+

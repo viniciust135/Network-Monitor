@@ -1,8 +1,6 @@
 from kafka import KafkaConsumer
 from json import loads
 from cassandra_helper import *
-from cassandra.cqlengine import connection
-from cassandra.cqlengine.management import sync_table
 import time
 
 
@@ -14,16 +12,10 @@ consumer = KafkaConsumer(
      group_id='my-group',
      value_deserializer=lambda x: loads(x.decode('utf-8')))
 
-#Configurar a conexão com os nós, o keyspace e a versão protocolo
-create_keyspace()
-connection.setup(['172.24.0.3'], "packets", protocol_version=3)
-#connection.setup(['172.17.0.1', '172.17.0.2'], "packets", protocol_version=3)
-sync_table(Connection)
-sync_table(SSH)
-sync_table(DHCP)
-sync_table(HTTP)
-sync_table(DNS)
-print("Iniciar")
+clusterIPs = ['172.28.0.2']
+
+ConnectDB( clusterIPs )
+print("Starting ...")
 
 for message in consumer:
         message = message.value
