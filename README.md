@@ -3,10 +3,8 @@
 <h3>1. Images </h3>
 Images used in project:
 
-Hbase (two options):
-https://github.com/dajobe/hbase-docker
-
-https://hub.docker.com/r/harisekhon/hbase/ <b>(used)</b>
+Cassandra:
+https://hub.docker.com/_/cassandra
 
 Kafka:
 https://hub.docker.com/r/wurstmeister/kafka/
@@ -22,14 +20,14 @@ https://hub.docker.com/r/thiagosordi/spark-streaming
 
 They are auto installed in Spark Streaming image, but:
 
-Python package to use HBase (using ```pip install```):
-- happybase (1.1.0)
-
 Python package to use Spark (using ```pip install```):
 - pyspark (2.4.4)
 
 Python package to use Kafka (using ```pip install```):
 - kafka-python (1.4.6)
+
+Python package to use Cassandra-driver (using ```pip install```):
+- cassandra-driver (3.19.0)(not updated  in image yet)
 
 <h3>2. Running containers </h3>
 
@@ -39,25 +37,14 @@ With all images installed, now it's just run.
 
 Running single container:
 Ex:
-```sudo docker run harisekhon/hbase```
+```sudo docker run thiagosordi/zeek```
 
-<h3>3. Configuring </h3>
-Configure the Zeek container:
+<h3>3. (Probably) Configuring Error Zeek Container </h3>
 
-```sudo docker exec -ti zeek bash```
-
-Type
-
-```zeekctl```
-
-and 
-
-```deploy```
-
-obs: if deploy gives an error, verify if the network interface is the same (eth0) that is configured, else https://stackoverflow.com/questions/39398773/error-while-starting-bro
+If running Zeek container gives an error, verify if the network interface is the same that is configured in ```node.cfg```, else change the interface in this file.
 
 <h3>4. (Optional) Manual Consumer</h3>
-Running hbase_helper.py and consumer.py in your machine to get some results:
+Running cassandra_helper.py and consumer.py in your machine to get some results:
 
 ```sudo python3 consumer.py```
 
