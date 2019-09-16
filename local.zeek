@@ -10,7 +10,7 @@
     );
     redef Kafka::topic_name = "zeek";
 #    redef Kafka::send_all_active_logs = T;
-    redef Kafka::logs_to_send = set(Conn::LOG, DNS::LOG, SSH::LOG);
+    redef Kafka::logs_to_send = set(Conn::LOG);
 #    redef Kafka::logs_to_send = set(Conn::LOG, DNS::LOG, SSH::LOG, HTTP::LOG, Notice::LOG);
     redef Kafka::tag_json = T;
 
