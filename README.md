@@ -47,9 +47,9 @@ Modify the script with this IP and run. You should see all messages on the termi
 To check if Cassandra is receiving all messages, connect in the container:
 ```
 docker exec -ti cassandra-n01 cqlsh
-cqlsh> describe keyspace packets;
-cqlsh> select * from packets.connection;
-cqlsh> select * from packets.connection where orig_h='10.1.4.50' ALLOW FILTERING;
+cqlsh> describe keyspace network;
+cqlsh> select * from network.connection;
+cqlsh> select * from network.connection where orig_h='10.1.4.50' ALLOW FILTERING;
 ```
 
 ## Spark Streaming
