@@ -56,11 +56,9 @@ cqlsh> select * from packets.connection where orig_h='10.1.4.50' ALLOW FILTERING
 
 Your need to modify ```KAFKA_ADVERTISED_HOST_NAME``` in ```docker-compose.yml``` to match your docker host IP. See https://github.com/wurstmeister/kafka-docker
 
-In addition, modify the line below to match your Docker bridge network of the containers:
+The image has a example that reads from Kafka every 30 seconds:
 ```
-docker run -ti --rm --network network-monitor_default spark-streaming /bin/bash
-cd /spark
-/usr/local/spark/bin/spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.4.0 spark.py
+docker exec -ti spark-streaming /usr/local/spark/bin/spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.4.0 /spark/spark.py
 ```
 
 ## Images 

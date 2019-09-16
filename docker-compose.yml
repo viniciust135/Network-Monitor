@@ -6,15 +6,15 @@ services:
     image: wurstmeister/zookeeper:latest
     container_name: zookeeper
     expose:
-    - "2181"
+      - "2181"
 
   kafka:
     image: wurstmeister/kafka:latest
     container_name: kafka
     depends_on:
-    - zookeeper
+      - zookeeper
     ports:
-    - "9092:9092"
+      - "9092:9092"
     environment:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://172.17.0.1:9092
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
@@ -59,7 +59,9 @@ services:
     build: Spark-docker
     image: spark-streaming
     container_name: spark-streaming
-    #    command: /spark/bin/spark-class org.apache.spark.deploy.master.Master -h spark-master
+    ports:
+      - "8080:8080"
+    command: /usr/local/spark/bin/spark-class org.apache.spark.deploy.master.Master -h spark-streaming --webui-port 8080
 
 volumes:
   n01-volume:
