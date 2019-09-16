@@ -52,6 +52,17 @@ cqlsh> select * from packets.connection;
 cqlsh> select * from packets.connection where orig_h='10.1.4.50' ALLOW FILTERING;
 ```
 
+## Spark Streaming
+
+Your need to modify ```KAFKA_ADVERTISED_HOST_NAME``` in ```docker-compose.yml``` to match your docker host IP. See https://github.com/wurstmeister/kafka-docker
+
+In addition, modify the line below to match your Docker bridge network of the containers:
+```
+docker run -ti --rm --network network-monitor_default spark-streaming /bin/bash
+cd /spark
+/usr/local/spark/bin/spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.4.0 spark.py
+```
+
 ## Images 
 Images used in project:
 
@@ -60,20 +71,4 @@ Images used in project:
 - ZooKeepeer: https://hub.docker.com/r/wurstmeister/zookeeper/
 - Zeek with connection plugin to Kafka: https://hub.docker.com/r/thiagosordi/zeek
 - Spark Streaming (Kafka Consumer): https://hub.docker.com/r/thiagosordi/spark-streaming
-
-## Run Spark Streaming (TODO)
-With all container running, now run the Spark Streaming container:
-
-```sudo docker exec -ti spark-streaming bash```
-
-After:
-
-```/usr/local/spark/bin/spark-submit  --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.4.0 spark.py```
-
-
-They are auto installed in Spark Streaming image, but:
-Python package to use Spark (using ```pip install```):
-- pyspark (2.4.4)
-
-This project is not finished
 
