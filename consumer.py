@@ -12,7 +12,7 @@ consumer = KafkaConsumer(
      group_id='my-group',
      value_deserializer=lambda x: loads(x.decode('utf-8')))
 
-clusterIPs = ['172.29.0.2']
+clusterIPs = ['192.168.80.2']
 
 ConnectDB( clusterIPs )
 print("Starting ...")
@@ -23,15 +23,16 @@ for message in consumer:
         if 'conn' in message:
                 message['conn'].update(identification = time.time())
                 insert_connection(message['conn'])
-        elif 'dns' in message:
-                message['dns'].update(identification = time.time())
-                insert_dns(message['dns'])
-        elif 'dhcp' in message:
-                message['dhcp'].update(identification = time.time())
-                insert_dhcp(message['dhcp'])
-        elif 'ssh' in message:
-                message['ssh'].update(identification = time.time())
-                insert_ssh(message['ssh'])
-        elif 'http' in message:
-                message['http'].update(identification = time.time())
-                insert_http(message['http'])
+#        elif 'dns' in message:
+#                message['dns'].update(identification = time.time())
+#                insert_dns(message['dns'])
+#        elif 'dhcp' in message:
+#                message['dhcp'].update(identification = time.time())
+#                insert_dhcp(message['dhcp'])
+#        elif 'ssh' in message:
+#                message['ssh'].update(identification = time.time())
+#                insert_ssh(message['ssh'])
+#        elif 'http' in message:
+#                print(message)
+#                message['http'].update(identification = time.time())
+#                insert_http(message['http'])

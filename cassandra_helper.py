@@ -4,11 +4,12 @@ from cassandra.cqlengine.models import Model
 from cassandra.cqlengine.management import sync_table
 from cassandra.cqlengine import connection
 import uuid
+from datetime import datetime 
 
 def ConnectDB( clusterIPs ):
         # cluster connection, keyspace, and protocol version
         create_keyspace( clusterIPs )
-        connection.setup( clusterIPs, "packets", protocol_version=3 )
+        connection.setup( clusterIPs, "network", protocol_version=3 )
         create_tables()
 
 
@@ -16,22 +17,22 @@ def create_keyspace( clusterIPs ):
         cluster = Cluster( clusterIPs )
         #This will attempt to connection to a Cassandra instance on your local machine (127.0.0.1). You can also specify a list of IP addresses for nodes in your cluster
         session = cluster.connect()
-        session.execute("CREATE KEYSPACE IF NOT EXISTS packets WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 3 }");	
+        session.execute("CREATE KEYSPACE IF NOT EXISTS network WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 }");	
         cluster.shutdown() 
 
 def create_tables():
         # https://docs.datastax.com/en/developer/python-driver/3.19/api/cassandra/cqlengine/management/
         sync_table(Connection)
-        sync_table(SSH)
-        sync_table(DHCP)
-        sync_table(HTTP)
-        sync_table(DNS)
+#        sync_table(SSH)
+#        sync_table(DHCP)
+#        sync_table(HTTP)
+#        sync_table(DNS)
+        # truncate microseconds from timestamps
 
 
 def insert_connection(data):
-	#Connection.create(service=str(data.get('service')), duration=str(data.get('duration')), orig_bytes=str(data.get('orig_bytes')), resp_bytes=str(data.get('resp_bytes')), conn_state=str(data.get('conn_state')), local_orig=str(data.get('local_orig')), local_resp=str(data.get('local_resp')), missed_bytes=str(data.get('missed_bytes')), history=str(data.get('history')), orig_pkts=str(data.get('orig_pkts')), orig_ip_bytes=str(data.get('orig_ip_bytes')), resp_pkts=str(data.get('resp_pkts')), resp_ip_bytes=str(data.get('resp_ip_bytes')), tunnel_parents=str(data.get('tunnel_parents')), vlan=str(data.get('vlan')), inner_vlan=str(data.get('inner_vlan')), orig_l2_addr=str(data.get('orig_l2_addr')), resp_l2_addr=str(data.get('resp_l2_addr')))
  	Connection.create(
-                 ts = float(data.get('ts')),
+                 ts = datetime.fromtimestamp(data.get('ts')),
                  uid = str(data.get('uid')),
                  orig_h = str(data.get('id.orig_h')),
                  orig_p = int(data.get('id.orig_p')),
@@ -53,13 +54,30 @@ def insert_connection(data):
                  orig_l2_addr = str(data.get('orig_l2_addr')),
                  resp_l2_addr = str(data.get('resp_l2_addr'))
          )
-
- 
- #{'conn': {'ts': 1568404324.317454, 'uid': 'CTRyjOWK8cOMG8FU7', 'id.orig_h': '200.18.42.61', 'id.orig_p': 53409, 'id.resp_h': '239.255.255.250', 'id.resp_p': 1900, 'proto': 'udp', 'duration': 3.0016438961029053, 'orig_bytes': 696, 'resp_bytes': 0, 'conn_state': 'S0', 'local_orig': False, 'local_resp': False, 'missed_bytes': 0, 'history': 'D', 'orig_pkts': 4, 'orig_ip_bytes': 808, 'resp_pkts': 0, 'resp_ip_bytes': 0, 'orig_l2_addr': '2c:59:e5:be:6a:5c', 'resp_l2_addr': '01:00:5e:7f:ff:fa'}}                       
+	#Connection.create(service=str(data.get('service')), duration=str(data.get('duration')), orig_bytes=str(data.get('orig_bytes')), resp_bytes=str(data.get('resp_bytes')), conn_state=str(data.get('conn_state')), local_orig=str(data.get('local_orig')), local_resp=str(data.get('local_resp')), missed_bytes=str(data.get('missed_bytes')), history=str(data.get('history')), orig_pkts=str(data.get('orig_pkts')), orig_ip_bytes=str(data.get('orig_ip_bytes')), resp_pkts=str(data.get('resp_pkts')), resp_ip_bytes=str(data.get('resp_ip_bytes')), tunnel_parents=str(data.get('tunnel_parents')), vlan=str(data.get('vlan')), inner_vlan=str(data.get('inner_vlan')), orig_l2_addr=str(data.get('orig_l2_addr')), resp_l2_addr=str(data.get('resp_l2_addr')))
+        #{'conn': {'ts': 1568404324.317454, 'uid': 'CTRyjOWK8cOMG8FU7', 'id.orig_h': '200.18.42.61', 'id.orig_p': 53409, 'id.resp_h': '239.255.255.250', 'id.resp_p': 1900, 'proto': 'udp', 'duration': 3.0016438961029053, 'orig_bytes': 696, 'resp_bytes': 0, 'conn_state': 'S0', 'local_orig': False, 'local_resp': False, 'missed_bytes': 0, 'history': 'D', 'orig_pkts': 4, 'orig_ip_bytes': 808, 'resp_pkts': 0, 'resp_ip_bytes': 0, 'orig_l2_addr': '2c:59:e5:be:6a:5c', 'resp_l2_addr': '01:00:5e:7f:ff:fa'}}                       
 
 
 def insert_ssh(data):
-	SSH.create(version_1=str(data.get('version_1')), auth_success=str(data.get('auth_success')), auth_attempts=str(data.get('auth_attempts')), direction=str(data.get('direction')), client=str(data.get('client')), server=str(data.get('server')), cipher_alg=str(data.get('cipher_alg')), mac_alg=str(data.get('mac_alg')), compression_alg=str(data.get('compression_alg')), kex_alg=str(data.get('kex_alg')), host_key_alg=str(data.get('host_key_alg')), host_key=str(data.get('host_key')))
+        SSH.create(
+                 ts = float(data.get('ts')),
+                 uid = str(data.get('uid')),
+                 orig_h = str(data.get('id.orig_h')),
+                 orig_p = int(data.get('id.orig_p')),
+                 resp_h = str(data.get('id.resp_h')),
+                 resp_p = int(data.get('id.resp_p')),
+                 auth_attempts = int(data.get('auth_attempts')),
+                 direction = str(data.get('direction')),
+                 server = str(data.get('server')),
+                 cipher_alg = str(data.get('cipher_alg')),
+                 mac_alg = str(data.get('mac_alg')),
+                 compression_alg=str(data.get('compression_alg')),
+                 kex_alg=str(data.get('kex_alg')),
+                 host_key_alg=str(data.get('host_key_alg')),
+                 host_key=str(data.get('host_key'))                 
+        )
+        #{'ssh': {'ts': 1568581444.058824, 'uid': 'CIUI2A4puDhH5Ul6K1', 'id.orig_h': '192.168.0.20', 'id.orig_p': 49782, 'id.resp_h': '200.18.42.100', 'id.resp_p': 22, 'auth_attempts': 0, 'direction': 'OUTBOUND', 'server': 'SSH-2.0-OpenSSH_7.4p1 Debian-10+deb9u6'}}
+	#SSH.create(version_1=str(data.get('version_1')), auth_success=str(data.get('auth_success')), auth_attempts=str(data.get('auth_attempts')), direction=str(data.get('direction')), client=str(data.get('client')), server=str(data.get('server')), cipher_alg=str(data.get('cipher_alg')), mac_alg=str(data.get('mac_alg')), compression_alg=str(data.get('compression_alg')), kex_alg=str(data.get('kex_alg')), host_key_alg=str(data.get('host_key_alg')), host_key=str(data.get('host_key')))
 
 def insert_dhcp(data):
 	DHCP.create(mac=str(data.get('mac')), assigned_ip=str(data.get('assigned_ip')), lease_time=str(data.get('lease_time')), trans_id1=str(data.get('trans_id1')))
@@ -72,14 +90,15 @@ def insert_dns(data):
 
 #{'conn': {'ts': 1568404324.317454, 'uid': 'CTRyjOWK8cOMG8FU7', 'id.orig_h': '200.18.42.61', 'id.orig_p': 53409, 'id.resp_h': '239.255.255.250', 'id.resp_p': 1900, 'proto': 'udp', 'duration': 3.0016438961029053, 'orig_bytes': 696, 'resp_bytes': 0, 'conn_state': 'S0', 'local_orig': False, 'local_resp': False, 'missed_bytes': 0, 'history': 'D', 'orig_pkts': 4, 'orig_ip_bytes': 808, 'resp_pkts': 0, 'resp_ip_bytes': 0, 'orig_l2_addr': '2c:59:e5:be:6a:5c', 'resp_l2_addr': '01:00:5e:7f:ff:fa'}}                       
 class Connection(Model):
+        #columns.DateTime.truncate_microseconds = True                
         id = columns.UUID(primary_key=True, default=uuid.uuid4)
-        ts = columns.Float(required=False)
-        uid = columns.Text(required=False)
-        orig_h = columns.Text(required=False)
-        orig_p = columns.Integer(required=False)
-        resp_h = columns.Text(required=False)
-        resp_p = columns.Integer(required=False)
-        proto = columns.Text(required=False)
+        ts = columns.DateTime(required=True)
+        uid = columns.Text(required=True)
+        orig_h = columns.Inet(required=True)
+        orig_p = columns.Integer(required=True)
+        resp_h = columns.Inet(required=True)
+        resp_p = columns.Integer(required=True)
+        proto = columns.Text(required=True)
         duration = columns.Float(required=False)
         orig_bytes = columns.Integer(required=False)
         resp_bytes = columns.Integer(required=False)
@@ -98,11 +117,14 @@ class Connection(Model):
 
 class SSH(Model):
         id = columns.UUID(primary_key=True, default=uuid.uuid4)
-        version_1  = columns.Text(required=False)
-        auth_success = columns.Text(required=False)
-        auth_attempts = columns.Text(required=False)
+        ts = columns.Float(required=False)
+        uid = columns.Text(required=False)
+        orig_h = columns.Text(required=False)
+        orig_p = columns.Integer(required=False)
+        resp_h = columns.Text(required=False)
+        resp_p = columns.Integer(required=False)
+        auth_attempts = columns.Integer(required=False)
         direction = columns.Text(required=False)
-        client = columns.Text(required=False)
         server = columns.Text(required=False)
         cipher_alg = columns.Text(required=False)
         mac_alg = columns.Text(required=False)
