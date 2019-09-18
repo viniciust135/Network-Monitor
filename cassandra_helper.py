@@ -165,11 +165,11 @@ class ConnBaseModel(Model):
         ts = columns.DateTime( primary_key=True, partition_key=True )
         #
         # CONN / SSH / DHCP / DNS / HTTP
-        log_type = columns.Text(discriminator_column=True, , index=True)
+        log_type = columns.Text(discriminator_column=True, index=True)
         # 
         uid = columns.Text(required=True)
         orig_h = columns.Inet(required=True, index=True)
-        orig_p = columns.Integer(required=True)
+        orig_p = columns.Integer(required=True, index=True)
         resp_h = columns.Inet(required=True, index=True)
         resp_p = columns.Integer(required=True, index=True)
         proto = columns.Text(required=True, index=True)

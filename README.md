@@ -59,6 +59,8 @@ Your need to modify ```KAFKA_ADVERTISED_HOST_NAME``` in ```docker-compose.yml```
 The image has a example that reads from Kafka every 30 seconds:
 ```
 docker exec -ti spark-streaming /usr/local/spark/bin/spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.4.0 /spark/spark.py
+
+docker exec -ti spark-streaming /usr/local/spark/bin/spark-submit --packages com.datastax.spark:spark-cassandra-connector_2.11:2.4.0 --conf spark.cassandra.connection.host=cassandra-n01 /spark/cassandra.py
 ```
 
 ## Images 
