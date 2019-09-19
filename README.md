@@ -52,15 +52,26 @@ cqlsh> select * from network.connection;
 cqlsh> select * from network.connection where orig_h='10.1.4.50' ALLOW FILTERING;
 ```
 
-## Spark Streaming
+## Spark 
 
 Your need to modify ```KAFKA_ADVERTISED_HOST_NAME``` in ```docker-compose.yml``` to match your docker host IP. See https://github.com/wurstmeister/kafka-docker
 
-The image has a example that reads from Kafka every 30 seconds:
+First example is the usage of Spark Streaming. The image has a example that reads from Kafka every 30 seconds:
 ```
 docker exec -ti spark-streaming /usr/local/spark/bin/spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.4.0 /spark/spark.py
+```
 
-docker exec -ti spark-streaming /usr/local/spark/bin/spark-submit --packages com.datastax.spark:spark-cassandra-connector_2.11:2.4.0 --conf spark.cassandra.connection.host=cassandra-n01 /spark/cassandra.py
+This second example reads from Cassandra and computes the number of connections by flows. First you need to create the ```testing``` keyspace and table in Cassandra:
+```
+docker exec -ti cassandra-n01 cqlsh
+cqlsh> CREATE KEYSPACE IF NOT EXISTS testing WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
+cqlsh> CREATE TABLE IF NOT EXISTS testing.conn_by_ip_total ( orig_h inet, resp_h inet, resp_p int, proto text, count bigint, PRIMARY KEY (orig_h,resp_h,resp_p) );
+```
+
+Then copy the code and execute:
+```
+docker cp cassandra.py spark-streaming:/spark/
+docker exec -ti spark-streaming /usr/local/spark/bin/spark-submit --packages com.datastax.spark:spark-cassandra-connector_2.11:2.4.0 --conf  spark.cassandra.connection.host=cassandra-n01 /spark/cassandra.py
 ```
 
 ## Images 
