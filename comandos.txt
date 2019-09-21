@@ -1,0 +1,42 @@
+#ativar venv
+./tcc/venv/bin/activate
+
+sudo docker-compose up -d
+sudo docker-compose down
+
+sudo docker-compose stop
+sudo docker-compose start
+
+
+#__________zeek__________
+**mudar o node.cfg
+sudo ip link show
+sudo docker exec -ti zeek zeekctl deploy
+
+#__________cassandra__________
+
+sudo docker exec -ti cassandra-n01 ip a
+sudo docker exec -ti cassandra-n01 cqlsh
+
+CREATE KEYSPACE IF NOT EXISTS testing WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
+CREATE TABLE IF NOT EXISTS testing.conn_by_ip_total ( orig_h inet, resp_h inet, resp_p int, proto text, count bigint, PRIMARY KEY (orig_h,resp_h,resp_p) );
+
+
+#__________spark-streaming__________
+
+
+sudo docker cp Spark-docker/spark.py spark-streaming:/spark/
+
+sudo docker exec -ti spark-streaming /bin/bash
+
+***kafka package
+sudo docker exec -ti spark-streaming /usr/local/spark/bin/spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.4.0 /spark/spark.py
+
+***kafka+cassandra packages
+sudo docker exec -ti spark-streaming /usr/local/spark/bin/spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.4.0,com.datastax.spark:spark-cassandra-connector_2.11:2.4.0 --conf  spark.cassandra.connection.host=cassandra-n01 /spark/spark.py
+
+***cassandra package
+sudo docker exec -ti spark-streaming /usr/local/spark/bin/spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.4.0 com.datastax.spark:spark-cassandra-connector_2.11:2.4.0 --conf  spark.cassandra.connection.host=cassandra-n01 /spark/spark.py
+
+
+

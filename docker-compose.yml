@@ -62,6 +62,8 @@ services:
     ports:
       - "8080:8080"
     command: /usr/local/spark/bin/spark-class org.apache.spark.deploy.master.Master -h spark-streaming --webui-port 8080
+    volumes:
+      - ./Spark-docker:/usr/local/spark/Spark-docker
 
 volumes:
   n01-volume:
