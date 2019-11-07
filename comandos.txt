@@ -18,6 +18,11 @@ sudo docker exec -ti zeek zeekctl deploy
 sudo docker exec -ti cassandra-n01 ip a
 sudo docker exec -ti cassandra-n01 cqlsh
 
+cqlsh> describe keyspace network;
+cqlsh> select * from network.connection;
+cqlsh> select * from network.connection where orig_h='10.1.4.50' ALLOW FILTERING;
+
+
 CREATE KEYSPACE IF NOT EXISTS testing WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
 CREATE TABLE IF NOT EXISTS testing.conn_by_ip_total ( orig_h inet, resp_h inet, resp_p int, proto text, count bigint, PRIMARY KEY (orig_h,resp_h,resp_p) );
 
