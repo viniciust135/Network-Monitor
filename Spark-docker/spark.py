@@ -49,9 +49,20 @@ def saveOnCassandra(rdd):
             dfPrTs = df1.withColumn("date", from_unixtime(df1['ts']))
             dfProtoHour = dfPrTs.select('proto', date_trunc("Hour", "date").alias("hour"))
             dfProtoDay = dfPrTs.select('proto', date_trunc("day", "date").alias("day"))
-            dfProtoDayFinal = dfProtoDay.groupBy(["proto","day"]).count().orderBy('count', ascending=False).cache().show()
-            dfProtoHoraFinal = dfProtoHour.groupBy(["proto","hour"]).count().orderBy('count', ascending=False).cache().show()
-            
+            dfProtoDayFinal = dfProtoDay.groupBy(["proto","day"]).count().orderBy('count', ascending=False).cache()
+            dfProtoHourFinal = dfProtoHour.groupBy(["proto","hour"]).count().orderBy('count', ascending=False).cache()
+
+            dfProtoDayFinal.write\
+                .format("org.apache.spark.sql.cassandra")\
+                .mode('append')\
+                .options(table="proto3_count_day", keyspace="network")\
+                .save()  
+
+            dfProtoHourFinal.write\
+                .format("org.apache.spark.sql.cassandra")\
+                .mode('append')\
+                .options(table="proto3_count_hour", keyspace="network")\
+                .save() 
             #df = df.withColumn('conn.date', df['conn.ts'].cast(DateType()))
             #df3 = df.groupBy(["conn.ts","conn.proto"]).count().orderBy('count', ascending=False).cache()
             #df3.show()
