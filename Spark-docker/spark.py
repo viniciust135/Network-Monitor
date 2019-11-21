@@ -21,7 +21,6 @@ def saveOnCassandra(rdd):
         #rdd = rddR.map(.value.toString)
 
         df = spark.read.json(rdd)
-        df.printSchema()
         #df = 
         #df = df
         #print(df.select("conn.ts").collect())
@@ -45,20 +44,22 @@ def saveOnCassandra(rdd):
 
         if 'conn' in df.columns:
             df = df.na.drop(subset=["conn.proto"])
-            df1 = df.select(["conn.ts","conn.proto"])
-            df2 = df.select(["conn.ts","conn.`id.orig_h`"])
-            df22 = df2.withColumnRenamed("id.orig_h", "orig_h")
-            df3 = df.select(["conn.ts","conn.`id.orig_p`"])
-            df33 = df3.withColumnRenamed("id.orig_p", "orig_p")
+
+            
+            #df2 = df.select(["conn.ts","conn.`id.orig_h`"])
+            #df22 = df2.withColumnRenamed("id.orig_h", "orig_h")
+            #df3 = df.select(["conn.ts","conn.`id.orig_p`"])
+            #df33 = df3.withColumnRenamed("id.orig_p", "orig_p")
             #df1 = df.groupBy(["conn.ts","conn.proto"]).count().orderBy('count', ascending=False).cache()
-            df33.show()
+            #df33.show()
+            
             #IP orig
-            dfDateOrig = df22.withColumn("date", from_unixtime(df2['ts']))
-            dfOrigHour = dfDateOrig.select('orig_h', date_trunc("Hour", "date").alias("hour"))
-            dfOrigHourFinal = dfOrigHour.groupBy(["orig_h","hour"]).count().orderBy('count', ascending=False).cache()
+            #dfDateOrig = df22.withColumn("date", from_unixtime(df2['ts']))
+            #dfOrigHour = dfDateOrig.select('orig_h', date_trunc("Hour", "date").alias("hour"))
+            #dfOrigHourFinal = dfOrigHour.groupBy(["orig_h","hour"]).count().orderBy('count', ascending=False).cache()
             #dfOrigHourFinal.show()
-            dfOrigDay = dfDateOrig.select('orig_h', date_trunc("day", "date").alias("day"))
-            dfOrigDayFinal = dfOrigDay.groupBy(["orig_h","day"]).count().orderBy('count', ascending=False).cache()
+            #dfOrigDay = dfDateOrig.select('orig_h', date_trunc("day", "date").alias("day"))
+            #dfOrigDayFinal = dfOrigDay.groupBy(["orig_h","day"]).count().orderBy('count', ascending=False).cache()
             #dfOrigDayFinal.show()
 
             #Port orig
@@ -70,12 +71,33 @@ def saveOnCassandra(rdd):
             #dfOrigDayFinal = dfOrigDay.groupBy(["orig_p","day"]).count().orderBy('count', ascending=False).cache()
             #dfOrigDayFinal.show()
 
+            #Flow
+            dfFlow = df.groupBy(["conn.`id.orig_h`","conn.`id.orig_p`","conn.`id.resp_h`", "conn.`id.resp_p`", "conn.proto"]).count()
+            #Flow with timestamp
+            dfFlowTs = df.select(["conn.ts","conn.`id.orig_h`","conn.`id.orig_p`","conn.`id.resp_h`", "conn.`id.resp_p`", "conn.proto"])
+            dfFlowDate = dfFlowTs.withColumn("date", from_unixtime(dfFlowTs['ts']))
+            #Flow per hour
+            dfFlowHourWithTsDate = dfFlowDate.withColumn("hour", date_trunc("Hour", "date"))
+            dfFlowHour = dfFlowHourWithTsDate.drop("ts","date")
+            dfFlowHourFinal = dfFlowHour.groupBy(["hour","`id.orig_h`","`id.orig_p`","`id.resp_h`", "`id.resp_p`", "proto"]).count()
+            dfFlowHourFinal.show()
+            #Flow per day
+            dfFlowDayWithTsDate = dfFlowDate.withColumn("day", date_trunc("day", "date"))
+            dfFlowDay = dfFlowDayWithTsDate.drop("ts","date")
+            dfFlowDayFinal = dfFlowDay.groupBy(["day","`id.orig_h`","`id.orig_p`","`id.resp_h`", "`id.resp_p`", "proto"]).count()
+            dfFlowDayFinal.show()
 
-            #dfPrTs = df1.withColumn("date", from_unixtime(df1['ts']))
-            #dfProtoHour = dfPrTs.select('proto', date_trunc("Hour", "date").alias("hour"))
-            #dfProtoDay = dfPrTs.select('proto', date_trunc("day", "date").alias("day"))
-            #dfProtoDayFinal = dfProtoDay.groupBy(["proto","day"]).count().orderBy('count', ascending=False).cache()
-            #dfProtoHourFinal = dfProtoHour.groupBy(["proto","hour"]).count().orderBy('count', ascending=False).cache()
+            #Proto
+            dfProto = df.select(["conn.proto"])
+            dfProtoAllFinal = dfProto.groupBy(["proto"]).count().show()
+            #Proto count with timestamp
+            dfPrTs = df.select(["conn.ts","conn.proto"])
+            dfProtoTs = dfPrTs.withColumn("date", from_unixtime(dfPrTs['ts']))
+            dfProtoHour = dfProtoTs.select('proto', date_trunc("Hour", "date").alias("hour"))
+            dfProtoHourFinal = dfProtoHour.groupBy(["proto","hour"]).count()
+            dfProtoDay = dfProtoTs.select('proto', date_trunc("day", "date").alias("day"))
+            dfProtoDayFinal = dfProtoDay.groupBy(["proto","day"]).count()
+
 
             #dfProtoDayFinal.write\
             #    .format("org.apache.spark.sql.cassandra")\
