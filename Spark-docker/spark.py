@@ -21,6 +21,7 @@ def saveOnCassandra(rdd):
         #rdd = rddR.map(.value.toString)
 
         df = spark.read.json(rdd)
+        df.printSchema()
         #df = 
         #df = df
         #print(df.select("conn.ts").collect())
@@ -45,24 +46,51 @@ def saveOnCassandra(rdd):
         if 'conn' in df.columns:
             df = df.na.drop(subset=["conn.proto"])
             df1 = df.select(["conn.ts","conn.proto"])
+            df2 = df.select(["conn.ts","conn.`id.orig_h`"])
+            df22 = df2.withColumnRenamed("id.orig_h", "orig_h")
+            df3 = df.select(["conn.ts","conn.`id.orig_p`"])
+            df33 = df3.withColumnRenamed("id.orig_p", "orig_p")
             #df1 = df.groupBy(["conn.ts","conn.proto"]).count().orderBy('count', ascending=False).cache()
-            dfPrTs = df1.withColumn("date", from_unixtime(df1['ts']))
-            dfProtoHour = dfPrTs.select('proto', date_trunc("Hour", "date").alias("hour"))
-            dfProtoDay = dfPrTs.select('proto', date_trunc("day", "date").alias("day"))
-            dfProtoDayFinal = dfProtoDay.groupBy(["proto","day"]).count().orderBy('count', ascending=False).cache()
-            dfProtoHourFinal = dfProtoHour.groupBy(["proto","hour"]).count().orderBy('count', ascending=False).cache()
+            df33.show()
+            #IP orig
+            dfDateOrig = df22.withColumn("date", from_unixtime(df2['ts']))
+            dfOrigHour = dfDateOrig.select('orig_h', date_trunc("Hour", "date").alias("hour"))
+            dfOrigHourFinal = dfOrigHour.groupBy(["orig_h","hour"]).count().orderBy('count', ascending=False).cache()
+            #dfOrigHourFinal.show()
+            dfOrigDay = dfDateOrig.select('orig_h', date_trunc("day", "date").alias("day"))
+            dfOrigDayFinal = dfOrigDay.groupBy(["orig_h","day"]).count().orderBy('count', ascending=False).cache()
+            #dfOrigDayFinal.show()
 
-            dfProtoDayFinal.write\
-                .format("org.apache.spark.sql.cassandra")\
-                .mode('append')\
-                .options(table="proto3_count_day", keyspace="network")\
-                .save()  
+            #Port orig
+            #dfDatePort = df33.withColumn("date", from_unixtime(df2['ts']))
+            #dfPortHour = dfDatePort.select('orig_p', date_trunc("Hour", "date").alias("hour"))
+            #dfPortHourFinal = dfPortHour.groupBy(["orig_p","hour"]).count().orderBy('count', ascending=False).cache()
+            #dfPortHourFinal.show()
+            #dfOrigDay = dfDateOrig.select('orig_p', date_trunc("day", "date").alias("day"))
+            #dfOrigDayFinal = dfOrigDay.groupBy(["orig_p","day"]).count().orderBy('count', ascending=False).cache()
+            #dfOrigDayFinal.show()
 
-            dfProtoHourFinal.write\
-                .format("org.apache.spark.sql.cassandra")\
-                .mode('append')\
-                .options(table="proto3_count_hour", keyspace="network")\
-                .save() 
+
+            #dfPrTs = df1.withColumn("date", from_unixtime(df1['ts']))
+            #dfProtoHour = dfPrTs.select('proto', date_trunc("Hour", "date").alias("hour"))
+            #dfProtoDay = dfPrTs.select('proto', date_trunc("day", "date").alias("day"))
+            #dfProtoDayFinal = dfProtoDay.groupBy(["proto","day"]).count().orderBy('count', ascending=False).cache()
+            #dfProtoHourFinal = dfProtoHour.groupBy(["proto","hour"]).count().orderBy('count', ascending=False).cache()
+
+            #dfProtoDayFinal.write\
+            #    .format("org.apache.spark.sql.cassandra")\
+            #    .mode('append')\
+            #    .options(table="proto3_count_day", keyspace="network")\
+            #    .save()  
+
+            #dfProtoHourFinal.write\
+            #    .format("org.apache.spark.sql.cassandra")\
+            #    .mode('append')\
+            #    .options(table="proto3_count_hour", keyspace="network")\
+            #    .save() 
+            
+            
+            
             #df = df.withColumn('conn.date', df['conn.ts'].cast(DateType()))
             #df3 = df.groupBy(["conn.ts","conn.proto"]).count().orderBy('count', ascending=False).cache()
             #df3.show()
