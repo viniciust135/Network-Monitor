@@ -43,25 +43,80 @@ def saveOnCassandra(rdd):
         #print(df.columns['conn'])
 
         if 'conn' in df.columns:
-            df = df.na.drop(subset=["conn.proto"])
+            '''
+            #Proto
+            try:
+                df = df.na.drop(subset=["conn.proto"])
+                dfProto = df.select(["conn.proto"])
+                dfProtoAllFinal = dfProto.groupBy(["proto"]).count().show()
+                #Proto count with timestamp
+                dfPrTs = df.select(["conn.ts","conn.proto"])
+                dfProtoTs = dfPrTs.withColumn("date", from_unixtime(dfPrTs['ts']))
+                dfProtoHour = dfProtoTs.select('proto', date_trunc("Hour", "date").alias("hour"))
+                dfProtoHourFinal = dfProtoHour.groupBy(["proto","hour"]).count()
+                dfProtoDay = dfProtoTs.select('proto', date_trunc("day", "date").alias("day"))
+                dfProtoDayFinal = dfProtoDay.groupBy(["proto","day"]).count()
+            except:
+                print("Erro no df de proto")
+                pass
+            #Service
+            try:
+                df = df.na.drop(subset=["conn.service"])
+                dfService = df.select(["conn.service"])
+                dfServiceTs = df.select(["conn.service", "conn.ts"])
+                dfServiceDate = dfServiceTs.withColumn('date', from_unixtime(dfServiceTs['ts']))
+                dfServiceHour = dfServiceDate.select("service", date_trunc("Hour", "date").alias("hour"))
+                dfServiceHourFinal = dfServiceHour.groupBy(["service","hour"]).count()
+                dfServiceDay = dfServiceDate.select('service', date_trunc("day", "date").alias("day"))
+                dfServiceDayFinal = dfServiceDay.groupBy(["service","day"]).count()
+                dfServiceHourFinal.show()
+                dfServiceDayFinal.show()
+            except:
+                print("Erro no df de service")
+                pass
+
+            try:
+                #Flow
+                dfFlow = df.groupBy(["conn.`id.orig_h`","conn.`id.orig_p`","conn.`id.resp_h`", "conn.`id.resp_p`", "conn.proto"]).count()
+                #Flow with timestamp
+                dfFlowTs = df.select(["conn.ts","conn.`id.orig_h`","conn.`id.orig_p`","conn.`id.resp_h`", "conn.`id.resp_p`", "conn.proto"])
+                dfFlowDate = dfFlowTs.withColumn("date", from_unixtime(dfFlowTs['ts']))
+                #Flow per hour
+                dfFlowHourWithTsDate = dfFlowDate.withColumn("hour", date_trunc("Hour", "date"))
+                dfFlowHour = dfFlowHourWithTsDate.drop("ts","date")
+                dfFlowHourFinal = dfFlowHour.groupBy(["hour","`id.orig_h`","`id.orig_p`","`id.resp_h`", "`id.resp_p`", "proto"]).count()
+                dfFlowHourFinal.show()
+                #Flow per day
+                dfFlowDayWithTsDate = dfFlowDate.withColumn("day", date_trunc("day", "date"))
+                dfFlowDay = dfFlowDayWithTsDate.drop("ts","date")
+                dfFlowDayFinal = dfFlowDay.groupBy(["day","`id.orig_h`","`id.orig_p`","`id.resp_h`", "`id.resp_p`", "proto"]).count()
+                dfFlowDayFinal.show()
+            except:
+                print("Erro no df de Flow")
+                pass
+            '''
 
             
-            #df2 = df.select(["conn.ts","conn.`id.orig_h`"])
-            #df22 = df2.withColumnRenamed("id.orig_h", "orig_h")
+            #IP orig
+            try:
+                dfIpOrigTs = df.select(["conn.ts","conn.`id.orig_h`"])
+                dfIpOrigTsRenamed = dfIpOrigTs.withColumnRenamed("id.orig_h", "orig_h")
+                dfIpOrigDate = dfIpOrigTsRenamed.withColumn("date", from_unixtime(dfIpOrigTsRenamed['ts']))
+                dfIpOrigHour = dfIpOrigDate.select('orig_h', date_trunc("Hour", "date").alias("hour"))
+                dfIpOrigHourFinal = dfIpOrigHour.groupBy(["orig_h","hour"]).count()
+                #dfIpOrigDay = dfIpOrigDate.select('orig_h', date_trunc("day", "date").alias("day"))
+                #dfIpOrigDayFinal = dfIpOrigDay.groupBy(["orig_h","day"]).count()
+                dfIpOrigHourFinal.show()
+                #dfIpOrigDayFinal.show()
+            except:
+                print("Erro no df de Orig_h")
+                pass
+
+            
             #df3 = df.select(["conn.ts","conn.`id.orig_p`"])
             #df33 = df3.withColumnRenamed("id.orig_p", "orig_p")
             #df1 = df.groupBy(["conn.ts","conn.proto"]).count().orderBy('count', ascending=False).cache()
             #df33.show()
-            
-            #IP orig
-            #dfDateOrig = df22.withColumn("date", from_unixtime(df2['ts']))
-            #dfOrigHour = dfDateOrig.select('orig_h', date_trunc("Hour", "date").alias("hour"))
-            #dfOrigHourFinal = dfOrigHour.groupBy(["orig_h","hour"]).count().orderBy('count', ascending=False).cache()
-            #dfOrigHourFinal.show()
-            #dfOrigDay = dfDateOrig.select('orig_h', date_trunc("day", "date").alias("day"))
-            #dfOrigDayFinal = dfOrigDay.groupBy(["orig_h","day"]).count().orderBy('count', ascending=False).cache()
-            #dfOrigDayFinal.show()
-
             #Port orig
             #dfDatePort = df33.withColumn("date", from_unixtime(df2['ts']))
             #dfPortHour = dfDatePort.select('orig_p', date_trunc("Hour", "date").alias("hour"))
@@ -70,34 +125,7 @@ def saveOnCassandra(rdd):
             #dfOrigDay = dfDateOrig.select('orig_p', date_trunc("day", "date").alias("day"))
             #dfOrigDayFinal = dfOrigDay.groupBy(["orig_p","day"]).count().orderBy('count', ascending=False).cache()
             #dfOrigDayFinal.show()
-
-            #Flow
-            dfFlow = df.groupBy(["conn.`id.orig_h`","conn.`id.orig_p`","conn.`id.resp_h`", "conn.`id.resp_p`", "conn.proto"]).count()
-            #Flow with timestamp
-            dfFlowTs = df.select(["conn.ts","conn.`id.orig_h`","conn.`id.orig_p`","conn.`id.resp_h`", "conn.`id.resp_p`", "conn.proto"])
-            dfFlowDate = dfFlowTs.withColumn("date", from_unixtime(dfFlowTs['ts']))
-            #Flow per hour
-            dfFlowHourWithTsDate = dfFlowDate.withColumn("hour", date_trunc("Hour", "date"))
-            dfFlowHour = dfFlowHourWithTsDate.drop("ts","date")
-            dfFlowHourFinal = dfFlowHour.groupBy(["hour","`id.orig_h`","`id.orig_p`","`id.resp_h`", "`id.resp_p`", "proto"]).count()
-            dfFlowHourFinal.show()
-            #Flow per day
-            dfFlowDayWithTsDate = dfFlowDate.withColumn("day", date_trunc("day", "date"))
-            dfFlowDay = dfFlowDayWithTsDate.drop("ts","date")
-            dfFlowDayFinal = dfFlowDay.groupBy(["day","`id.orig_h`","`id.orig_p`","`id.resp_h`", "`id.resp_p`", "proto"]).count()
-            dfFlowDayFinal.show()
-
-            #Proto
-            dfProto = df.select(["conn.proto"])
-            dfProtoAllFinal = dfProto.groupBy(["proto"]).count().show()
-            #Proto count with timestamp
-            dfPrTs = df.select(["conn.ts","conn.proto"])
-            dfProtoTs = dfPrTs.withColumn("date", from_unixtime(dfPrTs['ts']))
-            dfProtoHour = dfProtoTs.select('proto', date_trunc("Hour", "date").alias("hour"))
-            dfProtoHourFinal = dfProtoHour.groupBy(["proto","hour"]).count()
-            dfProtoDay = dfProtoTs.select('proto', date_trunc("day", "date").alias("day"))
-            dfProtoDayFinal = dfProtoDay.groupBy(["proto","day"]).count()
-
+            
 
             #dfProtoDayFinal.write\
             #    .format("org.apache.spark.sql.cassandra")\
@@ -136,25 +164,30 @@ def saveOnCassandra(rdd):
             #    .mode('append')\
             #    .options(table="conn_service_proto_count", keyspace="network")\
             #    .save()
-
-sc = SparkContext(appName="PythonSparkStreamingKafka")
-#sc.setLogLevel("OFF")
-sc.setLogLevel("WARN")
-spark = SparkSession(sc)
-ssc = StreamingContext(sc,5)
+try:
+    sc = SparkContext(appName="PythonSparkStreamingKafka")
+    #sc.setLogLevel("OFF")
+    sc.setLogLevel("WARN")
+    spark = SparkSession(sc)
+    ssc = StreamingContext(sc,5)
+except:
+    print("deu ruim 1")
 
 #clusterIPs = ['172.27.0.2']
 #ConnectDB( clusterIPs )
 #print("Starting connection to db")
+try:
+    kafkaStream = KafkaUtils.createStream(ssc, 'zookeeper:2181', 'my-group', {'zeek':1})
+    lines = kafkaStream.map(lambda x: x[1])
+except:
+    print("deu ruim 2")
 
-kafkaStream = KafkaUtils.createStream(ssc, 'zookeeper:2181', 'my-group', {'zeek':1})
-lines = kafkaStream.map(lambda x: x[1])
 lines.foreachRDD(saveOnCassandra)
-
-#js = lines.map(lambda x: loads(x.decode('utf-8')))
-#js.pprint()
 
 #lines.pprint()
 
-ssc.start()
-ssc.awaitTermination()
+try:
+    ssc.start()
+    ssc.awaitTermination()
+except:
+    print("deu ruim 3")

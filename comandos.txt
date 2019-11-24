@@ -13,6 +13,8 @@ sudo docker-compose start
 sudo ip link show
 sudo docker exec -ti zeek zeekctl deploy
 
+sudo docker exec -ti zeek zeek -r /data/Tuesday-WorkingHours.pcap local.zeek
+
 #__________cassandra__________
 
 sudo docker exec -ti cassandra-n01 ip a

@@ -30,7 +30,7 @@ services:
       - ./node.cfg:/usr/local/zeek/etc/node.cfg
       - ./local.zeek:/usr/local/zeek/share/zeek/site/local.zeek
       - ./main.zeek:/usr/local/zeek/share/zeek/base/frameworks/logging/main.zeek
-
+      - ../pcap/Tuesday-WorkingHours.pcap:/data/Tuesday-WorkingHours.pcap
   cassandra-n01:
     image: cassandra:latest
     container_name: cassandra-n01
