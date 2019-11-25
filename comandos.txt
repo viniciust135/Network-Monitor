@@ -15,6 +15,7 @@ sudo ip link show
 ***local:
 sudo docker exec -ti zeek zeekctl deploy
 ***pcap:
+sudo docker exec -ti zeek zeek -r pcap_files/ssh.pcap local.zeek
 sudo docker exec -ti zeek zeek -r /data/Tuesday-WorkingHours.pcap local.zeek
 
 #__________cassandra__________

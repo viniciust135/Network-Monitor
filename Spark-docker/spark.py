@@ -265,7 +265,8 @@ def saveOnCassandra(rdd):
                     .save()
             except Exception as e: 
                 print(e)
-
+                
+            print("SALVOU")
 
 try:
     sc = SparkContext(appName="PythonSparkStreamingKafka")
