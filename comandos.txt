@@ -11,8 +11,10 @@ sudo docker-compose start
 #__________zeek__________
 **mudar o node.cfg
 sudo ip link show
-sudo docker exec -ti zeek zeekctl deploy
 
+***local:
+sudo docker exec -ti zeek zeekctl deploy
+***pcap:
 sudo docker exec -ti zeek zeek -r /data/Tuesday-WorkingHours.pcap local.zeek
 
 #__________cassandra__________
@@ -27,6 +29,33 @@ cqlsh> select * from network.connection where orig_h='10.1.4.50' ALLOW FILTERING
 
 CREATE KEYSPACE IF NOT EXISTS testing WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
 CREATE TABLE IF NOT EXISTS testing.conn_by_ip_total ( orig_h inet, resp_h inet, resp_p int, proto text, count bigint, PRIMARY KEY (orig_h,resp_h,resp_p) );
+
+
+
+
+CREATE TABLE IF NOT EXISTS testing.resp_p_day ( resp_p int, day timestamp, count counter, PRIMARY KEY (resp_p,day) );
+CREATE TABLE IF NOT EXISTS testing.resp_p_hour ( resp_p int, hour timestamp, count counter, PRIMARY KEY (resp_p,hour) );
+
+CREATE TABLE IF NOT EXISTS testing.orig_p_day ( orig_p int, day timestamp, count counter, PRIMARY KEY (orig_p,day) );
+CREATE TABLE IF NOT EXISTS testing.orig_p_hour ( orig_p int, hour timestamp, count counter, PRIMARY KEY (orig_p,hour) );
+
+CREATE TABLE IF NOT EXISTS testing.orig_h_day ( orig_h inet, day timestamp, count counter, PRIMARY KEY (orig_h,day) );
+CREATE TABLE IF NOT EXISTS testing.orig_h_hour ( orig_h inet, hour timestamp, count counter, PRIMARY KEY (orig_h,hour) );
+
+CREATE TABLE IF NOT EXISTS testing.resp_h_day ( resp_h inet, day timestamp, count counter, PRIMARY KEY (resp_h,day) );
+CREATE TABLE IF NOT EXISTS testing.resp_h_hour ( resp_h inet, hour timestamp, count counter, PRIMARY KEY (resp_h,hour) );
+
+CREATE TABLE IF NOT EXISTS testing.proto_all ( proto text, count counter, PRIMARY KEY (proto) );
+CREATE TABLE IF NOT EXISTS testing.proto_day ( proto text, day timestamp, count counter, PRIMARY KEY (proto,day) );
+CREATE TABLE IF NOT EXISTS testing.proto_hour ( proto text, hour timestamp, count counter, PRIMARY KEY (proto,hour) );
+
+CREATE TABLE IF NOT EXISTS testing.service_day ( service text, day timestamp, count counter, PRIMARY KEY (service,day) );
+CREATE TABLE IF NOT EXISTS testing.service_hour ( service text, hour timestamp, count counter, PRIMARY KEY (service,hour) );
+
+CREATE TABLE IF NOT EXISTS testing.flow_day ( day timestamp, orig_h inet, orig_p int, resp_h inet, resp_p int, proto text, count counter, PRIMARY KEY (day,orig_h,orig_p,resp_h,resp_p,proto) );
+CREATE TABLE IF NOT EXISTS testing.flow_hour ( hour timestamp, orig_h inet, orig_p int, resp_h inet, resp_p int, proto text, count counter, PRIMARY KEY (hour,orig_h,orig_p,resp_h,resp_p,proto) );
+
+CREATE KEYSPACE network   WITH REPLICATION = {     'class' : 'SimpleStrategy',     'replication_factor' : 1    };
 
 
 #__________spark-streaming__________
