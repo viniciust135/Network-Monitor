@@ -10,16 +10,45 @@ from pyspark.sql.types import DateType
 
 def saveOnCassandra(rdd):
     if not rdd.isEmpty():
+        #js = rdd.map(lambda x: json.loads(x))
+        #a=rdd.collect()
+        #print(a)
+        #dict = rdd.collectAsMap()
+        #rddString = str(rdd.collect())
+        #print(rddString)
+        #dict = loads(rddString)
+        #print(dict)
+        #rdd = rddR.map(.value.toString)
 
         df = spark.read.json(rdd)
+        #df = 
+        #df = df
+        #print(df.select("conn.ts").collect())
+        #df.select(to_date(col('conn.ts')).alias('ts').cast("date")).show(10,False)
+        #df = df.withColumn('conn.date', df['conn.ts'].cast('date'))
+
+        #df1 = df.columns = ["conn"]
+        #df.printSchema()
+        #df2 = df.select()
+        #print(df.select("conn.id.orig_h").alias("orig_h").collect())
+        #df3 = df.groupBy(["conn.proto"]).count().orderBy('count', ascending=False).cache()
+        #df.printSchema()
+        #df.show()
+        #df.printSchema()
+        #df = loads(df).decode('utf-8')
+        #df['conn'].show()
+        #row = Row("conn")
+        #df = rdd.map(row).toDF()
+        #print(dict)
+        #print(df.columns['conn'])
 
         if 'conn' in df.columns:
-
+            '''
             #Proto
             try:
                 df = df.na.drop(subset=["conn.proto"])
                 dfProto = df.select(["conn.proto"])
-                dfProtoAllFinal = dfProto.groupBy(["proto"]).count()
+                dfProtoAllFinal = dfProto.groupBy(["proto"]).count().show()
                 #Proto count with timestamp
                 dfPrTs = df.select(["conn.ts","conn.proto"])
                 dfProtoTs = dfPrTs.withColumn("date", from_unixtime(dfPrTs['ts']))
@@ -27,13 +56,9 @@ def saveOnCassandra(rdd):
                 dfProtoHourFinal = dfProtoHour.groupBy(["proto","hour"]).count()
                 dfProtoDay = dfProtoTs.select('proto', date_trunc("day", "date").alias("day"))
                 dfProtoDayFinal = dfProtoDay.groupBy(["proto","day"]).count()
-                dfProtoAllFinal.show()
-                dfProtoHourFinal.show()
-                dfProtoDayFinal.show()
             except:
                 print("Erro no df de proto")
-                #pass
-            
+                pass
             #Service
             try:
                 df = df.na.drop(subset=["conn.service"])
@@ -48,91 +73,14 @@ def saveOnCassandra(rdd):
                 dfServiceDayFinal.show()
             except:
                 print("Erro no df de service")
-                #pass
-
-            #IP orig
-            try:
-                df = df.na.drop(subset=["conn.`id.orig_h`"])
-                dfIpOrigTs = df.select(["conn.ts","conn.`id.orig_h`"])
-                dfIpOrigTsRenamed = dfIpOrigTs.withColumnRenamed("id.orig_h", "orig_h")
-                dfIpOrigDate = dfIpOrigTsRenamed.withColumn("date", from_unixtime(dfIpOrigTsRenamed['ts']))
-
-                dfIpOrigHour = dfIpOrigDate.select('orig_h', date_trunc("Hour", "date").alias("hour"))
-                dfIpOrigHourFinal = dfIpOrigHour.groupBy(["orig_h","hour"]).count()
-                dfIpOrigHourFinal.show()
-
-                dfIpOrigDay = dfIpOrigDate.select('orig_h', date_trunc("day", "date").alias("day"))
-                dfIpOrigDayFinal = dfIpOrigDay.groupBy(["orig_h","day"]).count()
-                dfIpOrigDayFinal.show()
-            except:
-                print("Erro no df de Orig_h")
-                #pass
-            
-            #IP resp
-            try:
-                df = df.na.drop(subset=["conn.`id.resp_h`"])
-                dfIpRespTs = df.select(["conn.ts","conn.`id.resp_h`"])
-                dfIpRespTsRenamed = dfIpRespTs.withColumnRenamed("id.resp_h", "resp_h")
-                dfIpRespDate = dfIpRespTsRenamed.withColumn("date", from_unixtime(dfIpRespTsRenamed['ts']))
-
-                dfIpRespHour = dfIpRespDate.select('resp_h', date_trunc("Hour", "date").alias("hour"))
-                dfIpRespHourFinal = dfIpRespHour.groupBy(["resp_h","hour"]).count()
-                dfIpRespHourFinal.show()
-
-                dfIpRespDay = dfIpRespDate.select('resp_h', date_trunc("day", "date").alias("day"))
-                dfIpRespDayFinal = dfIpRespDay.groupBy(["resp_h","day"]).count()
-                dfIpRespDayFinal.show()
-            except:
-                print("Erro no df de resp_h")
-                #pass
-
-            #port_resp
+                pass
 
             try:
-                df = df.na.drop(subset=["conn.`id.resp_p`"])
-                dfPortRespTs = df.select(["conn.ts","conn.`id.resp_p`"])
-                dfPortRespTsRenamed = dfPortRespTs.withColumnRenamed("id.resp_p", "resp_p")
-                dfPortRespDate = dfPortRespTsRenamed.withColumn("date", from_unixtime(dfPortRespTsRenamed['ts']))
-
-                dfPortRespHour = dfPortRespDate.select('resp_p', date_trunc("Hour", "date").alias("hour"))
-                dfPortRespHourFinal = dfPortRespHour.groupBy(["resp_p","hour"]).count()
-                dfPortRespHourFinal.show()
-
-                dfPortRespDay = dfPortRespDate.select('resp_p', date_trunc("day", "date").alias("day"))
-                dfPortRespDayFinal = dfPortRespDay.groupBy(["resp_p","day"]).count()
-                dfPortRespDayFinal.show()
-            except:
-                print("Erro no df de resp_p")
-                #pass
-
-            #port_orig
-            try:
-                df = df.na.drop(subset=["conn.`id.orig_p`"])
-                dfPortOrigTs = df.select(["conn.ts","conn.`id.orig_p`"])
-                dfPortOrigTsRenamed = dfPortOrigTs.withColumnRenamed("id.orig_p", "orig_p")
-                dfPortOrigDate = dfPortOrigTsRenamed.withColumn("date", from_unixtime(dfPortOrigTsRenamed['ts']))
-
-                dfPortOrigHour = dfPortOrigDate.select('orig_p', date_trunc("Hour", "date").alias("hour"))
-                dfPortOrigHourFinal = dfPortOrigHour.groupBy(["orig_p","hour"]).count()
-                dfPortOrigHourFinal.show()
-
-                dfPortOrigDay = dfPortOrigDate.select('orig_p', date_trunc("day", "date").alias("day"))
-                dfPortOrigDayFinal = dfPortOrigDay.groupBy(["orig_p","day"]).count()
-                dfPortOrigDayFinal.show()
-            except:
-                print("Erro no df de orig_p")
-                #pass
-
-            #Flow
-            try:
+                #Flow
                 dfFlow = df.groupBy(["conn.`id.orig_h`","conn.`id.orig_p`","conn.`id.resp_h`", "conn.`id.resp_p`", "conn.proto"]).count()
                 #Flow with timestamp
                 dfFlowTs = df.select(["conn.ts","conn.`id.orig_h`","conn.`id.orig_p`","conn.`id.resp_h`", "conn.`id.resp_p`", "conn.proto"])
-                dfFlowDate = dfFlowTs.withColumn("date", from_unixtime(dfFlowTs['ts']))
-                #Flow per hour
-                dfFlowHourWithTsDate = dfFlowDate.withColumn("hour", date_trunc("Hour", "date"))
-                dfFlowHour = dfFlowHourWithTsDate.drop("ts","date")
-                dfFlowHourFinal = dfFlowHour.groupBy(["hour","`id.orig_h`","`id.orig_p`","`id.resp_h`", "`id.resp_p`", "proto"]).count()
+                dfFlowDate = dfFlowTs.withColumn("date", from_Orig_h`id.orig_h`","`id.orig_p`","`id.resp_h`", "`id.resp_p`", "proto"]).count()
                 dfFlowHourFinal.show()
                 #Flow per day
                 dfFlowDayWithTsDate = dfFlowDate.withColumn("day", date_trunc("day", "date"))
@@ -141,9 +89,40 @@ def saveOnCassandra(rdd):
                 dfFlowDayFinal.show()
             except:
                 print("Erro no df de Flow")
-                #pass
+                pass
+            '''
 
+            
+            #IP orig
+            try:
+                dfIpOrigTs = df.select(["conn.ts","conn.`id.orig_h`"])
+                dfIpOrigTsRenamed = dfIpOrigTs.withColumnRenamed("id.orig_h", "orig_h")
+                dfIpOrigDate = dfIpOrigTsRenamed.withColumn("date", from_unixtime(dfIpOrigTsRenamed['ts']))
+                dfIpOrigHour = dfIpOrigDate.select('orig_h', date_trunc("Hour", "date").alias("hour"))
+                dfIpOrigHourFinal = dfIpOrigHour.groupBy(["orig_h","hour"]).count()
+                #dfIpOrigDay = dfIpOrigDate.select('orig_h', date_trunc("day", "date").alias("day"))
+                #dfIpOrigDayFinal = dfIpOrigDay.groupBy(["orig_h","day"]).count()
+                dfIpOrigHourFinal.show()
+                #dfIpOrigDayFinal.show()
+            except:
+                print("Erro no df de Orig_h")
+                pass
 
+            
+            #IP resp
+            try:
+                dfIpRespTs = df.select(["conn.ts","conn.`id.resp_h`"])
+                dfIpRespTsRenamed = dfIpRespTs.withColumnRenamed("id.resp_h", "resp_h")
+                dfIpRespDate = dfIpRespTsRenamed.withColumn("date", from_unixtime(dfIpRespTsRenamed['ts']))
+                dfIpRespHour = dfIpRespDate.select('resp_h', date_trunc("Hour", "date").alias("hour"))
+                dfIpRespHourFinal = dfIpRespHour.groupBy(["resp_h","hour"]).count()
+                #dfIpRespDay = dfIpRespDate.select('orig_h', date_trunc("day", "date").alias("day"))
+                #dfIpRespDayFinal = dfIpRespDay.groupBy(["orig_h","day"]).count()
+                dfIpRespHourFinal.show()
+                #dfIpRespDayFinal.show()
+            except:
+                print("Erro no df de resp_h")
+                pass
 
             #df3 = df.select(["conn.ts","conn.`id.orig_p`"])
             #df33 = df3.withColumnRenamed("id.orig_p", "orig_p")
@@ -172,7 +151,20 @@ def saveOnCassandra(rdd):
             #    .save() 
             
             
-        
+            
+            #df = df.withColumn('conn.date', df['conn.ts'].cast(DateType()))
+            #df3 = df.groupBy(["conn.ts","conn.proto"]).count().orderBy('count', ascending=False).cache()
+            #df3.show()
+            #df = df['conn']
+            #.withColumnRenamed("conn.conn_state", "conn.alala")
+            #df = df.toDF
+            #df.printSchema()
+            #df.printSchema()
+            
+            #df2 = df.groupBy(["conn.service","conn.proto"]).count().orderBy('count', ascending=False).cache()
+            #df2.show()
+            #print(df.select("conn.proto").collect())
+            #print(df.select("conn.proto").rdd.map(lambda r: r(0)).collect())
             #df3.write\
             #    .format("org.apache.spark.sql.cassandra")\
             #    .mode('append')\
@@ -192,6 +184,9 @@ try:
 except:
     print("deu ruim 1")
 
+#clusterIPs = ['172.27.0.2']
+#ConnectDB( clusterIPs )
+#print("Starting connection to db")
 try:
     kafkaStream = KafkaUtils.createStream(ssc, 'zookeeper:2181', 'my-group', {'zeek':1})
     lines = kafkaStream.map(lambda x: x[1])
@@ -199,6 +194,7 @@ except:
     print("deu ruim 2")
 
 lines.foreachRDD(saveOnCassandra)
+
 #lines.pprint()
 
 try:
