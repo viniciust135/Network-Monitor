@@ -141,23 +141,7 @@ def saveOnCassandra(rdd):
                 dfFlowDayFinal.show()
             except:
                 print("Erro no df de Flow")
-                #pass
-
-
-
-            #df3 = df.select(["conn.ts","conn.`id.orig_p`"])
-            #df33 = df3.withColumnRenamed("id.orig_p", "orig_p")
-            #df1 = df.groupBy(["conn.ts","conn.proto"]).count().orderBy('count', ascending=False).cache()
-            #df33.show()
-            #Port orig
-            #dfDatePort = df33.withColumn("date", from_unixtime(df2['ts']))
-            #dfPortHour = dfDatePort.select('orig_p', date_trunc("Hour", "date").alias("hour"))
-            #dfPortHourFinal = dfPortHour.groupBy(["orig_p","hour"]).count().orderBy('count', ascending=False).cache()
-            #dfPortHourFinal.show()
-            #dfOrigDay = dfDateOrig.select('orig_p', date_trunc("day", "date").alias("day"))
-            #dfOrigDayFinal = dfOrigDay.groupBy(["orig_p","day"]).count().orderBy('count', ascending=False).cache()
-            #dfOrigDayFinal.show()
-            
+                #pass            
 
             #dfProtoDayFinal.write\
             #    .format("org.apache.spark.sql.cassandra")\
